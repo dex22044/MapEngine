@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: #2b2b2b;
+}
+
+.MapEngine_RunContainer {
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    height: 800px;
+    background-color: #71b8ff;
+    align-self: center;
+}
+
+.MapEngine_DisplayContainer {
+    margin: 10px;
+    background-color: #626262;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+}
+
+#MapEngine_Display {
+    background-image: url(./AfricaFis.png);
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+.MapEngine_QuestionBlock {
+    position: relative;
+    top: -150px;
+    margin: 5px;
+    background-color: #2b2b2b;
+    border: 1px dashed white;
+    width: 300px;
+    height: 50px;
+}
+
+#MapEngine_QuestionText {
+    position: relative;
+    color: white;
+    left: 5px;
+    top: 5px;
+}
+
+.MapEngine_BottomPanel {
+    background-color: #626262;
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    min-height: 100px;
+    width: calc(100% - 20px);
+}
+
+span {
+    font-family: Verdana;
+}
+
+.MapEngine_MarksBlock {
+    margin: 10px 10px;
+}
+
+.MapEngine_Marks_QuesTotalHead, .MapEngine_Marks_QuesTotal {
+    font-size: 1.3em;
+    color: #52b7ff;
+}
+
+.MapEngine_Marks_QuesRightHead, .MapEngine_Marks_QuesRight {
+    font-size: 1.3em;
+    color: #00dd4a;
+}
+
+.MapEngine_Marks_FinalMarkHead, .MapEngine_Marks_FinalMark {
+    font-size: 1.3em;
+    color: #ff0000;
+}
+
+.MapEngine_Credits {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 800px;
+    height: 30px;
+    background-color: transparent;
+    border: 2px solid white
+}
+
+.MapEngine_Credits span {
+    align-self: center;
+    font-size: 1em;
+    color: white;
+}
