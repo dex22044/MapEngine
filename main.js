@@ -18,7 +18,14 @@ function min(a, b) { return a < b ? a : b; }
 
 let mapObjects = [
     {
+        'name': 'its point here',
+        'type': 'point',
+        'position': [20, 20, 5]
+    },
+
+    {
         'name': 'amogus',
+        'type': 'contour',
         'contour': [
             [10.0, 10.0],
             [100.0, 10.0],
@@ -26,8 +33,10 @@ let mapObjects = [
             [10.0, 100.0]
         ]
     },
+
     {
         'name': 'sugomgus',
+        'type': 'contour',
         'contour': [
             [100.0, 100.0],
             [200.0, 50.0],
@@ -38,8 +47,8 @@ let mapObjects = [
     }
 ];
 
-
-function area (a, b, c) {
+//#region Intersection math shit
+function area(a, b, c) {
 	return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
 }
  
@@ -55,7 +64,7 @@ function intersect(a, b, c, d) {
 		&& area(a,b,c) * area(a,b,d) <= 0
 		&& area(c,d,a) * area(c,d,b) <= 0;
 }
-
+//#endregion
 
 window.addEventListener('load', function() {
     mainCanvas = this.document.querySelector('#MapEngine_Display');
@@ -75,6 +84,7 @@ window.addEventListener('load', function() {
     mainCanvas.addEventListener('click', canvasClicked);
 });
 
+//#region Events and timed shit
 function updateCanvasSize() {
     mainCanvas.width = mainCanvas.clientWidth;
     mainCanvas.height = mainCanvas.clientHeight;
@@ -104,15 +114,27 @@ function updateStats() {
 function canvasClicked() {
     let objectId = -1;
     for(let i = 0; i < mapObjects.length; i++) {
-        let intersectCount = 0;
-        let c = mapObjects[i].contour;
-        for(let j = 0; j < c.length; j++) {
-            if(intersect([canvasMouseX, canvasMouseY], [canvasMouseX + 1000, canvasMouseY],
-                            c[j], c[(j + 1) % c.length])) intersectCount++;
+        if(mapObjects[i].type == 'contour') {
+            let intersectCount = 0;
+            let c = mapObjects[i].contour;
+            for(let j = 0; j < c.length; j++) {
+                if(intersect([canvasMouseX, canvasMouseY], [canvasMouseX + 1000, canvasMouseY],
+                                c[j], c[(j + 1) % c.length])) intersectCount++;
+            }
+            if(intersectCount % 2 == 1) {
+                objectId = i;
+                break;
+            }
         }
-        if(intersectCount % 2 == 1) {
-            objectId = i;
-            break;
+
+        if(mapObjects[i].type == 'point') {
+            let dx = canvasMouseX - mapObjects[i].position[0];
+            let dy = canvasMouseY - mapObjects[i].position[1];
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if(distance <= mapObjects[i].position[2]) {
+                objectId = i;
+                break;
+            }
         }
     }
 
@@ -126,7 +148,9 @@ function canvasClicked() {
         if(questionId >= mapObjects.length) questionId = 0;
     }
 }
+//#endregion
 
+//#region All the rendering shit
 function canvasRender() {
     questionBoxElem.innerText = `Где ${mapObjects[questionId].name}?`;
 
@@ -135,30 +159,53 @@ function canvasRender() {
     if(canvasMouseIsIn) {
         let objectId = -1;
         for(let i = 0; i < mapObjects.length; i++) {
-            let intersectCount = 0;
-            let c = mapObjects[i].contour;
-            for(let j = 0; j < c.length; j++) {
-                if(intersect([canvasMouseX, canvasMouseY], [canvasMouseX + 1000, canvasMouseY],
-                                c[j], c[(j + 1) % c.length])) intersectCount++;
+            if(mapObjects[i].type == 'contour') {
+                let intersectCount = 0;
+                let c = mapObjects[i].contour;
+                for(let j = 0; j < c.length; j++) {
+                    if(intersect([canvasMouseX, canvasMouseY], [canvasMouseX + 1000, canvasMouseY],
+                                    c[j], c[(j + 1) % c.length])) intersectCount++;
+                }
+                if(intersectCount % 2 == 1) {
+                    objectId = i;
+                    break;
+                }
             }
-            if(intersectCount % 2 == 1) {
-                objectId = i;
-                break;
+
+            if(mapObjects[i].type == 'point') {
+                let dx = canvasMouseX - mapObjects[i].position[0];
+                let dy = canvasMouseY - mapObjects[i].position[1];
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if(distance <= mapObjects[i].position[2]) {
+                    objectId = i;
+                    break;
+                }
             }
         }
 
         if(objectId != -1) {
-            let c = mapObjects[objectId].contour;
-            
-            canvasContext.lineWidth = 2;
-            canvasContext.strokeStyle = '#FF0000';
-            canvasContext.beginPath();
-            canvasContext.moveTo(c[objectId][0], c[objectId][1]);
-            for(let j = 0; j < c.length; j++) {
-                canvasContext.lineTo(c[j][0], c[j][1]);
+            if(mapObjects[objectId].type == 'contour') {
+                let c = mapObjects[objectId].contour;
+                
+                canvasContext.lineWidth = 2;
+                canvasContext.strokeStyle = '#FF0000';
+                canvasContext.beginPath();
+                canvasContext.moveTo(c[objectId][0], c[objectId][1]);
+                for(let j = 0; j < c.length; j++) {
+                    canvasContext.lineTo(c[j][0], c[j][1]);
+                }
+                canvasContext.lineTo(c[0][0], c[0][1]);
+                canvasContext.stroke();
             }
-            canvasContext.lineTo(c[0][0], c[0][1]);
-            canvasContext.stroke();
+
+            if(mapObjects[objectId].type == 'point') {
+                let p = mapObjects[objectId].position;
+                canvasContext.fillStyle = '#FF0000';
+                canvasContext.beginPath();
+                canvasContext.arc(p[0], p[1], p[2], 0, 2 * Math.PI, false);
+                canvasContext.fill();
+            }
         }
     }
 }
+//#endregion
