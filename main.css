@@ -43,7 +43,7 @@ body {
     height: 50px;
 }
 
-#MapEngine_QuestionText {
+.MapEngine_QuestionBlock span {
     position: relative;
     color: white;
     left: 5px;
@@ -96,4 +96,10 @@ span {
     align-self: center;
     font-size: 1em;
     color: white;
+}
+
+#MapEngine_ObjectShow {
+    position: fixed;
+    visibility: hidden;
+    margin: 0;
 }
