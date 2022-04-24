@@ -16,36 +16,8 @@ let rightQuestions = 0;
 function max(a, b) { return a > b ? a : b; }
 function min(a, b) { return a < b ? a : b; }
 
-let mapObjects = [
-    {
-        'name': 'its point here',
-        'type': 'point',
-        'position': [20, 20, 5]
-    },
-
-    {
-        'name': 'amogus',
-        'type': 'contour',
-        'contour': [
-            [10.0, 10.0],
-            [100.0, 10.0],
-            [100.0, 100.0],
-            [10.0, 100.0]
-        ]
-    },
-
-    {
-        'name': 'sugomgus',
-        'type': 'contour',
-        'contour': [
-            [100.0, 100.0],
-            [200.0, 50.0],
-            [300.0, 100.0],
-            [200.0, 150.0],
-            [100.0, 200.0],
-        ]
-    }
-];
+let mapConfig;
+let mapObjects = [];
 
 //#region Intersection math shit
 function area(a, b, c) {
@@ -64,9 +36,42 @@ function intersect(a, b, c, d) {
 		&& area(a,b,c) * area(a,b,d) <= 0
 		&& area(c,d,a) * area(c,d,b) <= 0;
 }
+
+function pointToSegmentDist(x, y, x1, y1, x2, y2) {
+
+    var A = x - x1;
+    var B = y - y1;
+    var C = x2 - x1;
+    var D = y2 - y1;
+  
+    var dot = A * C + B * D;
+    var len_sq = C * C + D * D;
+    var param = -1;
+    if (len_sq != 0) //in case of 0 length line
+        param = dot / len_sq;
+  
+    var xx, yy;
+  
+    if (param < 0) {
+      xx = x1;
+      yy = y1;
+    }
+    else if (param > 1) {
+      xx = x2;
+      yy = y2;
+    }
+    else {
+      xx = x1 + param * C;
+      yy = y1 + param * D;
+    }
+  
+    var dx = x - xx;
+    var dy = y - yy;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 //#endregion
 
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
     mainCanvas = this.document.querySelector('#MapEngine_Display');
     questionBoxElem = this.document.querySelector('#MapEngine_QuestionText');
     
@@ -82,6 +87,15 @@ window.addEventListener('load', function() {
     mainCanvas.addEventListener('mouseover', canvasMouseOver);
     mainCanvas.addEventListener('mouseout', canvasMouseOut);
     mainCanvas.addEventListener('click', canvasClicked);
+
+    let response = await fetch('configs/Map7/AfricaFis.json');
+
+    if(response.ok) {
+        mapConfig = await response.json();
+        mapObjects = mapConfig.objects;
+    } else {
+        this.alert('Loading error');
+    }
 });
 
 //#region Events and timed shit
@@ -163,7 +177,7 @@ function canvasRender() {
                 let intersectCount = 0;
                 let c = mapObjects[i].contour;
                 for(let j = 0; j < c.length; j++) {
-                    if(intersect([canvasMouseX, canvasMouseY], [canvasMouseX + 1000, canvasMouseY],
+                    if(intersect([canvasMouseX, canvasMouseY + 0.1], [canvasMouseX + 1000, canvasMouseY + 0.1],
                                     c[j], c[(j + 1) % c.length])) intersectCount++;
                 }
                 if(intersectCount % 2 == 1) {
@@ -190,7 +204,7 @@ function canvasRender() {
                 canvasContext.lineWidth = 2;
                 canvasContext.strokeStyle = '#FF0000';
                 canvasContext.beginPath();
-                canvasContext.moveTo(c[objectId][0], c[objectId][1]);
+                canvasContext.moveTo(c[0][0], c[0][1]);
                 for(let j = 0; j < c.length; j++) {
                     canvasContext.lineTo(c[j][0], c[j][1]);
                 }

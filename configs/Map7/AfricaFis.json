@@ -1,0 +1,33 @@
+{
+    "imageName": "AfricaFis.png",
+    "objects": [
+        {
+            "name": "its point here",
+            "type": "point",
+            "position": [20, 20, 5]
+        },
+    
+        {
+            "name": "amogus",
+            "type": "contour",
+            "contour": [
+                [10.0, 10.0],
+                [100.0, 10.0],
+                [100.0, 100.0],
+                [10.0, 100.0]
+            ]
+        },
+    
+        {
+            "name": "sugomgus",
+            "type": "contour",
+            "contour": [
+                [100.0, 100.0],
+                [200.0, 50.0],
+                [300.0, 100.0],
+                [200.0, 150.0],
+                [100.0, 200.0]
+            ]
+        }
+    ]
+}
